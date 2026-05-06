@@ -1,11 +1,13 @@
 import firebase_admin
-from firebase_admin import firestore, credentials
+from firebase_admin import credentials, firestore
+import os
+import json
 
-db = None
+firebase_key = json.loads(os.environ["FIREBASE_KEY"])
 
-try:
-    cred = credentials.Certificate("serviceAccountKey.json")
+cred = credentials.Certificate(firebase_key)
+
+if not firebase_admin._apps:
     firebase_admin.initialize_app(cred)
-    db = firestore.client()
-except Exception as e:
-    print("Firebase disabled : ",e)
+
+db = firestore.client()
