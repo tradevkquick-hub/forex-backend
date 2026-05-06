@@ -30,11 +30,19 @@ from models import Trade
 from datetime import datetime,timedelta
 import random
 from tasks import close_trade
+from fastapi.middleware.cors import CORSMiddleware
 
 
 
 app = FastAPI()
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Create
 
