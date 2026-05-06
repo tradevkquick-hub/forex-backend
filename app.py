@@ -58,7 +58,10 @@ def get_live_price(asset):
 def register(user: UserRegister, db: Session = Depends(get_db)):
     db_user =create_user(user, db)
     create_wallet(db,db_user.id)
-    send_otp_email(db_user.email,"Welcome",db_user.referral_code)
+    try:
+        send_otp_email(db_user.email, "Welcome", db_user.referral_code)
+    except Exception as e:
+        print(e)
     return {"id": db_user.id, "email": db_user.email,"referral_code": db_user.referral_code}
 @app.post("/login")
 def login(user: LoginRequest,db: Session = Depends(get_db)):
