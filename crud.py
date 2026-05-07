@@ -4,10 +4,12 @@ from models import User
 from schemas import UserRegister
 from models import Wallet
 from utils import generate_referral_code
+from passlib.context import CryptContext
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 def create_user(user: UserRegister, db: Session):
     try:
-        hashed_password = bcrypt.hash(user.password.strip())
+        hashed_password = pwd_context.hash(user.password.strip())
         new_referral_code = generate_referral_code()
 
         print("STEP 1")
@@ -42,7 +44,7 @@ def authenticate_user(email: str,password: str,db:Session):
     user =db.query(User).filter(User.email == email).first()
     if not user:
         return None
-    if not bcrypt.verify(password.strip(),user.password):
+    if not pwd_context.verify(password.strip(),user.password):
         return None
     return user
 def create_wallet(db,user_id):
