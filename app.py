@@ -58,14 +58,30 @@ def get_live_price(asset):
 def register(user: UserRegister, db: Session = Depends(get_db)):
     return create_user(user, db)
 @app.post("/login")
-def login(user: LoginRequest,db: Session = Depends(get_db)):
+def login(user: LoginRequest, db: Session = Depends(get_db)):
+
+    print("STEP 1")
+
     db_user = authenticate_user(user.email, user.password, db)
+
+    print("STEP 2")
+
     if not db_user:
         raise HTTPException(status_code=400, detail="Incorrect email or password")
+
     otp = generate_otp()
-    store_otp(user.email,otp)
-    send_otp_email(user.email, otp)
-    return{"message":"OTP sent"}
+
+    print("STEP 3")
+
+    store_otp(user.email, otp)
+
+    print("STEP 4")
+
+    # send_otp_email(user.email, otp)
+
+    print("STEP 5")
+
+    return {"message": "OTP sent"}
 @app.post("/verify-otp")
 def verify_otp(data:VerifyOTP):
     stored_otp = otp_storage.get(data.email)
