@@ -7,7 +7,7 @@ from passlib.context import CryptContext
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 def create_user(user: UserRegister, db: Session):
-    hashed_password = pwd_context.hash(str(user.password))
+    hashed_password = pwd_context.hash(user.password.strip())
 
     new_referral_code = generate_referral_code()
 
@@ -26,7 +26,7 @@ def authenticate_user(email: str,password: str,db:Session):
     user =db.query(User).filter(User.email == email).first()
     if not user:
         return None
-    if not pwd_context.verify(password.strip(),user.password):
+    if not pwd_context.verify(password,user.password):
         return None
     return user
 def create_wallet(db,user_id):
