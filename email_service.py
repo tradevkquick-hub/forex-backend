@@ -1,8 +1,13 @@
 import smtplib
 from email.mime.text import MIMEText
 
-EMAIL = "nk20forex@gmail.com"
-APP_PASSWORD = "your_16_character_app_password"
+SMTP_SERVER = "smtp-relay.brevo.com"
+SMTP_PORT = 587
+
+SMTP_LOGIN = "aa95f5001@smtp-brevo.com"
+SMTP_PASSWORD = "03GW46rpAIjahZsw"
+
+SENDER_EMAIL = "trade.vkquick@gmail.com"
 
 
 def send_otp_email(receiver_email, otp, referral_code=None):
@@ -10,46 +15,40 @@ def send_otp_email(receiver_email, otp, referral_code=None):
     subject = "ForexPro Login Verification Code"
 
     body = f"""
-DEAR SIR/MAM,
+Dear User,
 
-Your One-Time Password (OTP) for logging into ForexPro Trading is: {otp}
+Your OTP is: {otp}
 
-Your Referral Code: {referral_code}
-
-Share this code with friends and earn rewards.
+Referral Code: {referral_code}
 
 This OTP is valid for 10 minutes.
 
-If you did not request this login, please ignore this email or contact our support team.
-
-For security reasons, do not share this OTP with anyone.
-
 Regards,
-ForexPro Security Team
+ForexPro Team
 """
 
     msg = MIMEText(body)
 
     msg["Subject"] = subject
-    msg["From"] = EMAIL
+    msg["From"] = SENDER_EMAIL
     msg["To"] = receiver_email
 
     try:
-        server = smtplib.SMTP("smtp.gmail.com", 587)
+        server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
 
         server.starttls()
 
-        server.login(EMAIL, APP_PASSWORD)
+        server.login(SMTP_LOGIN, SMTP_PASSWORD)
 
         server.sendmail(
-            EMAIL,
+            SENDER_EMAIL,
             receiver_email,
             msg.as_string()
         )
 
-        print("EMAIL SENT SUCCESSFULLY")
-
         server.quit()
 
+        print("EMAIL SENT SUCCESSFULLY")
+
     except Exception as e:
-        print("EMAIL ERROR:", str(e))
+        print("EMAIL ERROR:", e)
