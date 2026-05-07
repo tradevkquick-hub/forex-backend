@@ -55,10 +55,8 @@ def get_live_price(asset):
 
 # Registration endpoint
 @app.post("/register")
-def register():
-    return {
-        "status": "register route working"
-    }
+def register(user: UserRegister, db: Session = Depends(get_db)):
+    return create_user(user, db)
 @app.post("/login")
 def login(user: LoginRequest,db: Session = Depends(get_db)):
     db_user = authenticate_user(user.email, user.password, db)

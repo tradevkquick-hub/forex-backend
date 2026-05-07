@@ -10,22 +10,34 @@ def create_user(user: UserRegister, db: Session):
         hashed_password = bcrypt.hash(user.password)
         new_referral_code = generate_referral_code()
 
+        print("STEP 1")
+
         db_user = User(
             email=user.email,
             password=hashed_password,
             referral_code=new_referral_code
         )
 
+        print("STEP 2")
+
         db.add(db_user)
+
+        print("STEP 3")
+
         db.commit()
+
+        print("STEP 4")
+
         db.refresh(db_user)
+
+        print("STEP 5")
 
         return db_user
 
     except Exception as e:
+        print("ERROR:", str(e))
+        db.rollback()
         return {"error": str(e)}
-
-    return db_user
 def authenticate_user(email: str,password: str,db:Session):
     user =db.query(User).filter(User.email == email).first()
     if not user:
