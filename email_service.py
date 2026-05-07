@@ -1,11 +1,13 @@
-import smtplib
-from email.mime.text import MIMEText
+import os
+import sib_api_v3_sdk
+from sib_api_v3_sdk.rest import ApiException
 
-SMTP_SERVER = "smtp-relay.brevo.com"
-SMTP_PORT = 587
+configuration = sib_api_v3_sdk.Configuration()
+configuration.api_key['api-key'] = os.getenv("BREVO_API_KEY")
 
-SMTP_LOGIN = "aa95f5001@smtp-brevo.com"
-SMTP_PASSWORD = "03GW46rpAIjahZsw"
+api_instance = sib_api_v3_sdk.TransactionalEmailsApi(
+    sib_api_v3_sdk.ApiClient(configuration)
+)
 
 SENDER_EMAIL = "trade.vkquick@gmail.com"
 
@@ -14,41 +16,34 @@ def send_otp_email(receiver_email, otp, referral_code=None):
 
     subject = "ForexPro Login Verification Code"
 
-    body = f"""
-Dear User,
+    html_content = f"""
+    <html>
+    <body>
+        <h2>Your OTP is: {otp}</h2>
+        <p>Referral Code: {referral_code}</p>
+        <p>This OTP is valid for 10 minutes.</p>
 
-Your OTP is: {otp}
+        <br>
+        <p>Regards,</p>
+        <p>ForexPro Team</p>
+    </body>
+    </html>
+    """
 
-Referral Code: {referral_code}
-
-This OTP is valid for 10 minutes.
-
-Regards,
-ForexPro Team
-"""
-
-    msg = MIMEText(body)
-
-    msg["Subject"] = subject
-    msg["From"] = SENDER_EMAIL
-    msg["To"] = receiver_email
+    send_smtp_email = sib_api_v3_sdk.SendSmtpEmail(
+        to=[{"email": receiver_email}],
+        sender={
+            "email": SENDER_EMAIL,
+            "name": "ForexPro"
+        },
+        subject=subject,
+        html_content=html_content
+    )
 
     try:
-        server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
+        api_response = api_instance.send_transac_email(send_smtp_email)
+        print("EMAIL SENT SUCCESS")
+        print(api_response)
 
-        server.starttls()
-
-        server.login(SMTP_LOGIN, SMTP_PASSWORD)
-
-        server.sendmail(
-            SENDER_EMAIL,
-            receiver_email,
-            msg.as_string()
-        )
-
-        server.quit()
-
-        print("EMAIL SENT SUCCESSFULLY")
-
-    except Exception as e:
+    except ApiException as e:
         print("EMAIL ERROR:", e)
