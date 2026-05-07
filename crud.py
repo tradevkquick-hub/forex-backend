@@ -7,7 +7,7 @@ from utils import generate_referral_code
 
 def create_user(user: UserRegister, db: Session):
     try:
-        hashed_password = bcrypt.hash(user.password)
+        hashed_password = bcrypt.hash(str(user.password))
         new_referral_code = generate_referral_code()
 
         print("STEP 1")
@@ -42,7 +42,7 @@ def authenticate_user(email: str,password: str,db:Session):
     user =db.query(User).filter(User.email == email).first()
     if not user:
         return None
-    if not bcrypt.verify(password,user.password):
+    if not bcrypt.verify(str(password),user.password):
         return None
     return user
 def create_wallet(db,user_id):
