@@ -1,5 +1,4 @@
 from sqlalchemy.orm import Session
-from passlib.hash import bcrypt
 from models import User
 from schemas import UserRegister
 from models import Wallet
@@ -8,38 +7,21 @@ from passlib.context import CryptContext
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 def create_user(user: UserRegister, db: Session):
-    try:
-        hashed_password = pwd_context.hash(user.password.strip())
-        new_referral_code = generate_referral_code()
+    hashed_password = pwd_context.hash(str(user.password))
 
-        print("STEP 1")
+    new_referral_code = generate_referral_code()
 
-        db_user = User(
-            email=user.email,
-            password=hashed_password,
-            referral_code=new_referral_code
-        )
+    db_user = User(
+        email=user.email,
+        password=hashed_password,
+        referral_code=new_referral_code
+    )
 
-        print("STEP 2")
+    db.add(db_user)
+    db.commit()
+    db.refresh(db_user)
 
-        db.add(db_user)
-
-        print("STEP 3")
-
-        db.commit()
-
-        print("STEP 4")
-
-        db.refresh(db_user)
-
-        print("STEP 5")
-
-        return db_user
-
-    except Exception as e:
-        print("ERROR:", str(e))
-        db.rollback()
-        return {"error": str(e)}
+    return db_user
 def authenticate_user(email: str,password: str,db:Session):
     user =db.query(User).filter(User.email == email).first()
     if not user:
