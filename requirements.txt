@@ -4,7 +4,8 @@ firebase-admin
 redis
 sqlalchemy
 psycopg2-binary
-passlib
+passlib[bcrypt]
 email-validator
 python-jose[cryptografy]
 celery
+bcrypt
