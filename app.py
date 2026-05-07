@@ -55,7 +55,7 @@ def get_live_price(asset):
 
 # Registration endpoint
 @app.post("/register")
-def register(user:UserRegister):
+def register(user:UserRegister,db: Session = Depends(get_db)):
     return {"email":user.email}
 @app.post("/login")
 def login(user: LoginRequest,db: Session = Depends(get_db)):
