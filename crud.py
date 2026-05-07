@@ -6,18 +6,24 @@ from models import Wallet
 from utils import generate_referral_code
 
 def create_user(user: UserRegister, db: Session):
-    hashed_password = bcrypt.hash(user.password)
-    new_referral_code = generate_referral_code()
+    try:
+        hashed_password = bcrypt.hash(user.password)
+        new_referral_code = generate_referral_code()
 
-    db_user = User(
-        email=user.email,
-        password=hashed_password,
-        referral_code=new_referral_code
-    )
+        db_user = User(
+            email=user.email,
+            password=hashed_password,
+            referral_code=new_referral_code
+        )
 
-    db.add(db_user)
-    db.commit()
-    db.refresh(db_user)
+        db.add(db_user)
+        db.commit()
+        db.refresh(db_user)
+
+        return db_user
+
+    except Exception as e:
+        return {"error": str(e)}
 
     return db_user
 def authenticate_user(email: str,password: str,db:Session):
