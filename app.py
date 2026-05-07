@@ -77,7 +77,7 @@ def login(user: LoginRequest, db: Session = Depends(get_db)):
 
     print("STEP 4")
 
-    # send_otp_email(user.email, otp)
+    send_otp_email(user.email, otp)
 
     print("STEP 5")
 
