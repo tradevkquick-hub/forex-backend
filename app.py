@@ -55,14 +55,8 @@ def get_live_price(asset):
 
 # Registration endpoint
 @app.post("/register")
-def register(user: UserRegister, db: Session = Depends(get_db)):
-    db_user =create_user(user, db)
-    create_wallet(db,db_user.id)
-    try:
-        send_otp_email(db_user.email, "Welcome", db_user.referral_code)
-    except Exception as e:
-        print(e)
-    return {"id": db_user.id, "email": db_user.email,"referral_code": db_user.referral_code}
+def register():
+    return {"message": "register working"}
 @app.post("/login")
 def login(user: LoginRequest,db: Session = Depends(get_db)):
     db_user = authenticate_user(user.email, user.password, db)
