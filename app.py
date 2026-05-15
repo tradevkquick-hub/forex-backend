@@ -108,6 +108,36 @@ def update_profile(data: UpdateProfile, db: Session = Depends(get_db), current_u
     db.commit()
     db.refresh(current_user)
     return {"message":"Profile Updated successfully"}
+@app.get("/profile")
+async def get_profile(email: str):
+
+    try:
+        user_ref = db.collection("users").document(email)
+        user_doc = user_ref.get()
+
+        if not user_doc.exists:
+            return {
+                "success": False,
+                "message": "User not found"
+            }
+
+        user_data = user_doc.to_dict()
+
+        return {
+            "success": True,
+            "data": {
+                "name": user_data.get("name", ""),
+                "email": user_data.get("email", ""),
+                "mobile": user_data.get("mobile", ""),
+                "referral_code": user_data.get("referral_code", "")
+            }
+        }
+
+    except Exception as e:
+        return {
+            "success": False,
+            "message": str(e)
+        }
 @app.post("/forgot-password")
 def forgot_password(data:ForgotPassword):
     otp = generate_reset_otp(data.email)
