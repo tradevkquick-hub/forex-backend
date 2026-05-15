@@ -160,11 +160,32 @@ def reset_password(data: ResetPassword,db: Session = Depends(get_db)):
     return {"message":"Password Reset successfully"}
 
 @app.get("/wallet")
-def get_wallet(email:str, db: Session = Depends(get_db)):
+def get_wallet(email: str, db: Session = Depends(get_db)):
+
     user = db.query(User).filter(User.email == email).first()
+
     if not user:
-        return {"message":"User not found"}
+        return {"message": "User not found"}
+
     wallet = db.query(Wallet).filter(Wallet.user_id == user.id).first()
+
+    # create wallet if not exists
+    if not wallet:
+        wallet = Wallet(
+            user_id=user.id,
+            balance=0,
+            available_balance=0,
+            bonus=0,
+            margin_used=0,
+            floating_pl=0,
+            equity=0,
+            currency="USD"
+        )
+
+        db.add(wallet)
+        db.commit()
+        db.refresh(wallet)
+
     return {
         "balance": wallet.balance,
         "available_balance": wallet.available_balance,
