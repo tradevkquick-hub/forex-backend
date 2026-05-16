@@ -272,7 +272,7 @@ def get_transactions(email: str,db: Session = Depends(get_db)):
             "time":tx.created_at
         })
         return result
-@app.post("/trade", response_model=TradeResponse)
+@app.post("/trade")
 def place_trade(data: PlaceTradeRequest, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.email == data.email).first()
 
