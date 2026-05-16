@@ -10,7 +10,6 @@ from passlib.context import CryptContext
 from schemas import LoginRequest,VerifyOTP
 from crud import authenticate_user
 from otp import generate_otp
-from otp_store import otp_storage
 from fastapi import  HTTPException
 from email_service import send_otp_email
 from otp_store import store_otp
