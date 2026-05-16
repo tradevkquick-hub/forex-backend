@@ -41,28 +41,42 @@ class Wallet(Base):
 class Transaction(Base):
     __tablename__ = "transactions"
     id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"))
+    user_id = Column(Integer, ForeignKey("users.id"),nullable=False)
     type = Column(String)
     amount = Column(Float)
     description = Column(String)
     currency = Column(String,default="USDT")
     created_at = Column(DateTime,default=datetime.utcnow)
+    user = relationship("User")
 class Trade(Base):
     __tablename__ = "trades"
+
     id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"),index=True)
-    asset = Column(String,index=True)
-    direction = Column(String)
-    amount = Column(Float)
-    entry_price  = Column(Float)
-    exit_price = Column(Float,nullable=True)
-    duration = Column(Integer)
-    expiry_time = Column(DateTime)
-    payout_percentage = Column(Float,default=0.8)
-    profit = Column(Float,default=0)
-    result = Column(String,nullable=True)
-    status = Column(String,default="open")
-    created_at = Column(DateTime,default=datetime.utcnow)
+
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+
+    symbol = Column(String, nullable=False)          # EURUSD, BTCUSDT
+    direction = Column(String, nullable=False)       # UP / DOWN
+    amount = Column(Float, nullable=False)
+
+    entry_price = Column(Float, nullable=False)
+    exit_price = Column(Float, nullable=True)
+
+    payout_percent = Column(Float, default=80.0)
+    profit = Column(Float, default=0.0)
+
+    status = Column(String, default="OPEN")          # OPEN / WON / LOST / DRAW / CANCELLED
+
+    account_type = Column(String, default="DEMO")    # DEMO / REAL
+    duration = Column(Integer, nullable=False)       # seconds
+
+    opened_at = Column(DateTime, default=datetime.utcnow)
+    expiry_time = Column(DateTime, nullable=False)
+    closed_at = Column(DateTime, nullable=True)
+
+    is_settled = Column(Boolean, default=False)
+
+    user = relationship("User")
 
 
 

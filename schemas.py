@@ -1,7 +1,7 @@
 from typing import Optional
 
 from pydantic import BaseModel, EmailStr, validator
-from datetime import date
+from datetime import date,datetime
 
 class UserRegister(BaseModel):
     email: EmailStr
@@ -49,10 +49,32 @@ class WalletResponse(BaseModel):
     floating_pl : float
     equity : float
     currency : str
+class PlaceTradeRequest(BaseModel):
+    symbol: str
+    direction: str
+    amount: float
+    duration: int
+    account_type: str = "DEMO"
 
 
+class TradeResponse(BaseModel):
+    id: int
+    symbol: str
+    direction: str
+    amount: float
+    entry_price: float
+    exit_price: Optional[float] = None
+    payout_percent: float
+    profit: float
+    status: str
+    account_type: str
+    duration: int
+    opened_at: datetime
+    expiry_time: datetime
+    closed_at: Optional[datetime] = None
 
-    # Always include this for SQLAlchemy compatibility
+    class Config:
+        from_attributes = True
 
 
 

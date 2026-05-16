@@ -273,41 +273,44 @@ def get_transactions(email: str,db: Session = Depends(get_db)):
             "time":tx.created_at
         })
         return result
-@app.post("/trade")
-def place_trade(email:str,asset:str,direction: str,amount:float,duration:int,background_tasks: BackgroundTasks,db: Session = Depends(get_db)):
-    user = db.query(User).filter(User.email == email).first()
+@app.post("/trade", response_model=TradeResponse)
+def place_trade(data: PlaceTradeRequest, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.email == data.email).first()
+
     if not user:
-        return {"message":"User not found"}
+        raise HTTPException(status_code=404, detail="User not found")
+
     wallet = db.query(Wallet).filter(Wallet.user_id == user.id).first()
+
     if not wallet:
-        return {"message":"Wallet not found"}
-    if wallet.available_balance < amount:
-        return {"message":"Insufficient balance"}
-    wallet.available_balance -= amount
-    wallet.margin_used += amount
-    entry_price = get_live_price(asset)
-    print("ENTRY PRICE",entry_price)
-    expiry_time = datetime.utcnow() + timedelta(seconds=duration)
+        raise HTTPException(status_code=404, detail="Wallet not found")
+
+    if wallet.available_balance < data.amount:
+        raise HTTPException(status_code=400, detail="Insufficient balance")
+
+    entry_price = get_live_price(data.symbol)
+
     trade = Trade(
         user_id=user.id,
-        asset=asset,
-        direction=direction,
-        amount=amount,
+        symbol=data.symbol.upper(),
+        direction=data.direction.upper(),
+        amount=data.amount,
         entry_price=entry_price,
-        duration=duration,
-        expiry_time=expiry_time,
-        payout_percentage=0.8
+        payout_percent=80.0,
+        status="OPEN",
+        account_type=data.account_type.upper(),
+        duration=data.duration,
+        expiry_time=datetime.utcnow() + timedelta(seconds=data.duration),
     )
+
+    wallet.available_balance -= data.amount
+    wallet.margin_used += data.amount
+
     db.add(trade)
     db.commit()
     db.refresh(trade)
-    close_trade.delay(trade.id,duration)
-    return {
-        "message":"Trade placed successfully",
-        "trade":trade.id,
-        "entry_price":entry_price,
-        "expiry_time":expiry_time
-    }
+
+    return trade
 
 
 
