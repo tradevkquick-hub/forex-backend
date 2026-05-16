@@ -23,7 +23,6 @@ from schemas import UpdateProfile
 from otp_service import generate_reset_otp,verify_reset_otp
 from schemas import ForgotPassword,VerifyResetOTP,ResetPassword
 from crud import create_wallet
-from schemas import WalletResponse
 from  utils import generate_referral_code
 from models import Transaction
 from models import Trade
