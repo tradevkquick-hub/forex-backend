@@ -49,6 +49,7 @@ class WalletResponse(BaseModel):
     floating_pl : float
     equity : float
     currency : str
+
 class PlaceTradeRequest(BaseModel):
     symbol: str
     direction: str

@@ -31,6 +31,7 @@ from datetime import datetime,timedelta
 import random
 from tasks import close_trade
 from fastapi.middleware.cors import CORSMiddleware
+from schemas import PlaceTradeRequest,TradeResponse
 
 
 
